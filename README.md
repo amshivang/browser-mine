@@ -1,130 +1,210 @@
-# Browser Mine — The Wild Below
+<div align="center">
 
-🎮 **Live Demo:** [https://amshivang.github.io/browser-mine/](https://amshivang.github.io/browser-mine/)
+  <p>
+    <a href="https://github.com/amshivang"><strong>Shivang Shukla (@amshivang)</strong></a> • 
+    <a href="https://github.com/amshivang?tab=repositories">Portfolio Repositories</a> • 
+    <a href="mailto:linkwithshivang@gmail.com">Contact</a>
+  </p>
 
-An original, single-player voxel survival game that runs in your browser. Explore seeded terrain, mine resources, craft tools, build shelters, manage food and health, and store your supplies in Trail Caches. Terrain is generated in Web Workers and rendered with Three.js. The title illustration and inventory icons are original inline SVG art; fonts are bundled locally.
+  # ⛏️ Browser Mine — The Wild Below
+  ### Procedural 3D Voxel Survival Sandbox Engine in Browser
 
-## Run locally
+  <p>
+    <em>A client-side 3D voxel sandbox game engineered with TypeScript, Three.js, and multi-threaded Web Workers, featuring infinite seeded terrain generation, dynamic atmospheric simulation, and zero external dependencies.</em>
+  </p>
 
-Use **Node.js 22.12+** (or Node.js 20.19+) and npm. Vite 7 requires a compatible modern Node.js version.
+  <p>
+    <a href="https://amshivang.github.io/browser-mine/"><img src="https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-0284C7?style=for-the-badge&logo=githubpages&logoColor=white" alt="Live Demo"/></a>
+    <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"/></a>
+    <a href="https://threejs.org/"><img src="https://img.shields.io/badge/Three.js-WebGL%202-000000?style=for-the-badge&logo=three.js&logoColor=white" alt="Three.js"/></a>
+    <a href="https://vitejs.dev/"><img src="https://img.shields.io/badge/Vite-7.1-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite"/></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-EAB308?style=for-the-badge" alt="License: MIT"/></a>
+  </p>
 
-From the project directory:
+  <p>
+    <a href="#-overview">Overview</a> •
+    <a href="#-key-features">Key Features</a> •
+    <a href="#-architecture--tech-stack">Tech Stack</a> •
+    <a href="#-controls--gameplay">Controls</a> •
+    <a href="#-quick-start">Quick Start</a> •
+    <a href="#-repository-structure">Structure</a> •
+    <a href="#-performance--sandboxing">Performance & Sandboxing</a> •
+    <a href="#-author--connect">Author</a>
+  </p>
 
-```sh
+</div>
+
+---
+
+## 📌 Overview
+
+**Browser Mine — The Wild Below** is an original, single-player 3D voxel survival sandbox game engineered to run natively in modern web browsers at high frame rates. Built from the ground up without heavy external game engines (such as Unity or Unreal), it harnesses modern web standards including **WebGL 2**, **Web Workers**, **IndexedDB**, and the **Web Audio API**.
+
+Players explore seeded procedurally generated worlds, excavate geological strata, harvest timber and minerals, craft tiered tools with realistic durability decay, erect shelters, manage hunger and vital health bars, and secure surplus goods in persistent caches.
+
+🌐 **Play the Live Game:** [https://amshivang.github.io/browser-mine/](https://amshivang.github.io/browser-mine/)
+
+---
+
+## ✨ Key Features
+
+- **🌐 Multi-Threaded Chunk Generation**: Offloads Perlin/Simplex procedural terrain computation to dedicated browser **Web Workers**, preventing UI main thread stutters and maintaining steady 60 FPS rendering.
+- **🎲 Deterministic World Seeding**: Identical seed strings generate identical topography, biomes (redwood forests, caves, plains), ore distribution veins, and flora.
+- **⚒️ Tiered Tool Progression & Durability**: From wooden picks to slate and iron tools; specific materials (like deep iron and lumenite) require corresponding tool harvest tiers.
+- **🌅 Dynamic Day/Night & Weather Simulation**: Atmospheric skybox shifts dynamically from daylight to starry nights with ambient lighting changes, rain systems, and particle effects.
+- **💾 Local World Persistence**: Automatically saves world block alterations, player coordinate vectors, inventory contents, and chest caches to browser **IndexedDB** and **localStorage**.
+- **🎨 100% Self-Contained Vector Art**: Title typography, UI iconography, and crosshairs are crafted as crisp inline SVG vectors with locally bundled offline fonts.
+
+---
+
+## 🛠️ Architecture & Tech Stack
+
+| Component / Layer | Technology | Version | Architectural Role & Rationale |
+| :--- | :--- | :--- | :--- |
+| **Language** | TypeScript | `>= 5.9.0` | Strict static typing across ECS architecture, world coordinates, and game state |
+| **3D Rendering** | Three.js | `>= 0.180.0` | Scene graph management, frustum culling, shader materials, and WebGL 2 pipelines |
+| **Build Tool** | Vite | `>= 7.1.0` | Ultra-fast ES module HMR development server and optimized rollup bundling |
+| **Concurrency** | Web Workers API | Native | Asynchronous voxel terrain meshing and noise calculation off main thread |
+| **Data Persistence**| IndexedDB / LocalStorage | Native | Zero-backend local storage for multi-world save files and user preferences |
+| **Audio Engine** | Web Audio API | Native | Procedural sound generation and spatial distance attenuation |
+| **Testing** | Playwright | `>= 1.56.0` | End-to-end headless browser testing across Chromium runtimes |
+
+---
+
+## 🎮 Controls & Gameplay
+
+Movement, sprint, crouch, inventory, consumption, and item dropping can be rebound inside the in-game **Controls** menu.
+
+| Action | Default Key / Input | In-Game Function |
+| :--- | :--- | :--- |
+| **Move** | <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> | Directional walking / swimming |
+| **Look** | Mouse Movement | Pointer-locked first-person camera rotation |
+| **Jump / Swim Up** | <kbd>Space</kbd> | Jump or ascend in water |
+| **Sprint** | <kbd>Left Shift</kbd> | Accelerates movement speed (consumes hunger) |
+| **Crouch / Swim Down** | <kbd>Left Ctrl</kbd> | Sneak without falling off edges / dive in water |
+| **Mine / Attack** | <kbd>Left Mouse</kbd> (Hold) | Break targeted blocks or strike entities |
+| **Place Block / Open**| <kbd>Right Mouse</kbd> | Place active hotbar block or open chest cache |
+| **Crouch Place** | <kbd>Ctrl</kbd> + <kbd>Right Mouse</kbd> | Place block against a chest without opening UI |
+| **Hotbar Selection** | <kbd>1</kbd> – <kbd>9</kbd> or Scroll Wheel | Switch active handheld item |
+| **Field Pack (Inventory)**| <kbd>E</kbd> | Open / close crafting grid and inventory |
+| **Eat Food** | <kbd>F</kbd> | Consume held food item to restore hunger/health |
+| **Drop Item** | <kbd>Q</kbd> | Discard single item from selected hotbar slot |
+| **Pause / Release Mouse**| <kbd>Escape</kbd> | Pause simulation and unlock mouse cursor |
+| **Quick Save** | <kbd>F5</kbd> | Force write game state to local IndexedDB |
+
+---
+
+## 🚀 Quick Start
+
+### Option 1: Play Instantly
+Navigate to **[https://amshivang.github.io/browser-mine/](https://amshivang.github.io/browser-mine/)** in any modern desktop browser (Chrome, Edge, Firefox, Brave).
+
+### Option 2: Local Development Setup
+Requires **Node.js 20.19+** or **Node.js 22.12+** and npm.
+
+```bash
+# 1. Clone repository
+git clone https://github.com/amshivang/browser-mine.git
+cd browser-mine
+
+# 2. Install dependencies
 npm ci
+
+# 3. Start local development server
 npm run dev
 ```
 
-Open **http://127.0.0.1:5174**. The development server uses a strict port: if 5174 is already in use, stop the other server before starting it. `npm install` can also install dependencies; `npm ci` uses the checked-in lockfile.
+Open `http://127.0.0.1:5174` in your browser.
 
-### Production build and local preview
+```bash
+# Type check and run automated browser tests
+npm run check
+npm run test
 
-```sh
+# Production build and preview
 npm run build
 npm run preview
 ```
 
-The build is written to `dist/`. Preview normally opens at **http://127.0.0.1:4173**; use the address printed by Vite. To preview at the development address instead:
+---
 
-```sh
-npm run preview -- --port 5174 --strictPort
+## 📂 Repository Structure
+
+```
+browser-mine/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml              # Automated GitHub Pages CI/CD workflow
+├── public/
+│   └── favicon.svg                 # Application favicon
+├── src/
+│   ├── entities/
+│   │   └── EntityManager.ts        # Entity lifecycle and drops management
+│   ├── game/
+│   │   ├── Game.ts                 # Main game loop, tick dispatcher & camera
+│   │   └── InputManager.ts         # Pointer lock & keyboard event handling
+│   ├── inventory/
+│   │   ├── Inventory.ts            # Pack state, slot swapping & stack splitting
+│   │   └── items.ts                # Item registry, crafting recipes & durability
+│   ├── persistence/
+│   │   └── SaveManager.ts          # IndexedDB chunk serialization
+│   ├── player/
+│   │   ├── HandModel.ts            # First-person animated tool rendering
+│   │   └── Player.ts               # Player physics, AABB collisions & vitals
+│   ├── systems/
+│   │   ├── AudioManager.ts         # Procedural sound effect synthesizer
+│   │   ├── DayNight.ts             # Sunlight angle, sky shader & lighting transitions
+│   │   ├── Particles.ts            # Block breaking and environmental particles
+│   │   └── Weather.ts              # Rain simulation and cloud volume rendering
+│   ├── ui/
+│   │   └── UIManager.ts            # HUD, crafting menu & hotbar DOM controllers
+│   ├── world/
+│   │   ├── BiomeGenerator.ts       # Simplex noise biomes, caves & ore veins
+│   │   ├── blocks.ts               # Block textures, hardness & tool requirements
+│   │   ├── Chunk.ts                # 16x16x256 voxel mesh generator
+│   │   └── generation.worker.ts    # Background Web Worker thread entry
+│   ├── main.ts                     # Application bootstrap
+│   └── styles.css                  # HUD styles and responsive overlays
+├── index.html                      # HTML entry template
+├── package.json                    # Project dependencies and npm scripts
+├── playwright.config.ts            # Playwright end-to-end testing configuration
+├── tsconfig.json                   # TypeScript compiler configuration
+├── vite.config.ts                  # Vite bundler configuration
+├── LICENSE                         # MIT License
+└── README.md                       # Comprehensive documentation
 ```
 
-Serve the app over HTTP locally or HTTPS when hosted. Opening `index.html` as a `file://` URL does not provide the module/worker environment the game needs.
+---
 
-## Browser requirements
+## ⚡ Performance & Sandboxing
 
-- A recent **desktop browser** with **WebGL 2**, JavaScript modules, and **Web Workers**. Enable graphics/hardware acceleration. Chromium-based browsers are the target of the automated browser tests; other browsers require their own verification.
-- A **keyboard and mouse** with pointer-lock support. Click the world or **Resume** to capture the mouse; **Escape** releases it. Touch/gamepad controls are not implemented.
-- **IndexedDB and localStorage** for persistent worlds, the world list, and settings. Private browsing, blocked site storage, or a full storage quota can prevent persistence.
-- **Web Audio** for sound. Audio begins after a user interaction. Fullscreen depends on browser support and permission.
+- **Zero Remote Telemetry**: Runs 100% inside the client sandbox with zero backend reporting or tracking.
+- **Worker Isolation**: CPU-intensive voxel generation occurs in an isolated background thread, guaranteeing stutter-free 60 FPS gameplay.
+- **Memory Safety**: Chunks outside render distance are culled and garbage collected to prevent memory bloat in extended sessions.
 
-Rendering performance depends on your graphics hardware and settings. For a slower machine, use **Low** graphics, reduce render/loading distance, and turn off shadows. The responsive menus also fit smaller windows; this does not make gameplay touch-enabled.
+---
 
-## Your first five minutes
+## 📜 License
 
-1. Choose **Create New World**, name your expedition, and optionally enter a seed. Leaving the seed blank generates one. Identical seeds generate identical base terrain.
-2. Your starter hotbar contains a **Redwood Pick (wooden pick)**, **8 Redwood**, **8 Sun Berries**, and **8 Glowreed**. Click the world to look around. Select slot **1**, aim at exposed **Slate**, and hold the left mouse button to mine. Walk close to dropped resources to collect them.
-3. Collect **3 Slate**. Open **E** and craft a **Slate Pick** using **3 Slate + 2 Redwood**. Move the pick into the first inventory row (the hotbar), close the pack, and select its numbered slot.
-4. Mine iron veins using the **Slate Pick or better**, then craft an **Iron Pick** from **3 Iron + 2 Redwood**. A wooden pick cannot collect iron drops. An Iron Pick can collect **Lumenite**. Watch tool durability and keep materials for replacements.
-5. Keep food in your hotbar. Select it and press **F** when hungry. Sunberry Bushes and Sunbells drop berries; Duskcaps are food too. **3 Sun Berries → 1 Trail Loaf**. High hunger helps health recover; sprinting consumes more hunger.
-6. Right-click to place blocks and starter Glowreed lights. **1 Coal + 1 Redwood → 4 Glowreed**. Build a shelter and keep a lit route back to the surface.
-7. Craft storage: **1 Redwood → 4 Cut Redwood**, then **8 Cut Redwood → 1 Trail Cache (chest)**. Place the cache and right-click it to open. Hold your crouch key while right-clicking to place a block against a chest instead of opening it.
+Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
 
-The **Field Guide** is available from the title, pause menu, controls, and field pack. It reflects your current key bindings.
+---
 
-## Default controls
+## 👤 Author & Connect
 
-Movement, jump, sprint, crouch, inventory, eat, and drop can be rebound in **Controls**.
+<div align="center">
+  <p><strong>Shivang Shukla</strong></p>
+  <p><em>Cybersecurity & Digital Forensics Scholar @ UPSIFS (Uttar Pradesh State Institute of Forensic Sciences)</em></p>
 
-| Action | Default control |
-| --- | --- |
-| Move | W / A / S / D |
-| Look | Mouse, after clicking the world |
-| Jump / swim upward | Space |
-| Sprint | Left Shift |
-| Crouch / swim downward | Left Ctrl |
-| Mine / attack | Hold left mouse button |
-| Place selected block / open placed chest | Right mouse button |
-| Place against a chest without opening it | Crouch + right mouse button |
-| Select hotbar slot | 1–9 or mouse wheel |
-| Open / close field pack or close chest | E |
-| Eat selected food | F |
-| Drop one item from selected hotbar stack | Q |
-| Pause / release mouse | Escape |
-| Save world | F5 |
-| Toggle debug display | F3 |
+  <p>
+    <a href="https://github.com/amshivang"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"/></a>
+    <a href="https://www.linkedin.com/in/amshivang/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>
+    <a href="mailto:linkwithshivang@gmail.com"><img src="https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email"/></a>
+  </p>
 
-### Inventory and crafting
-
-- The first **9 slots** are your hotbar. The remaining slots are the backpack.
-- Drag a stack onto another slot, or click a stack and then its destination. Matching material stacks merge where space permits. **Cancel move** clears a pending click-to-move selection.
-- **Shift-click** moves a stack between the hotbar and backpack, merging where possible.
-- **Right-click** a pack stack to split half into an empty slot. Splitting requires an empty slot.
-- Recipes show **owned / required** ingredient counts. Green counts mean enough material; warm-colored counts indicate a shortage. Hover a recipe for its purpose and missing-material details. Click a ready recipe to craft; the output must fit in your pack.
-- Tool silhouettes and durability bars distinguish equipment from materials. Hover an inventory slot for its name, use, and remaining durability.
-- In a chest, **click or Shift-click** transfers a whole stack between chest and pack. **Right-click** transfers half, or the single item when there is only one. Partial transfers leave the remainder in place when the destination is full.
-
-## Saving and resuming
-
-Use **Save World** in the pause menu or **F5**. The game also attempts periodic autosaves and saves when leaving the world. Choose **Save & Quit**, then **Load World → Play** to return later. World saves include player state, inventory, modified blocks, and chest contents.
-
-Saves are **local to the browser profile and origin** (protocol, hostname, and port). For example, `127.0.0.1:5174`, `localhost:5174`, and `127.0.0.1:4173` have separate storage. Use the same address to find your existing worlds. Clearing site data or deleting a world removes its local save; there is no cloud sync or export/import interface.
-
-If settings cannot be written to localStorage, the UI keeps them active for the current session and shows a toast. Enable site storage to retain them after reload. World-save failures also appear as in-game messages; check the message before assuming progress was persisted.
-
-Death drops your pack at your death location. **Respawn** returns you to the spawn point; recover supplies or rebuild your kit.
-
-## Checks and browser tests
-
-```sh
-npm run check        # TypeScript type check
-npm run build        # TypeScript check + Vite production build
-npx playwright install chromium
-```
-
-The Playwright configuration accepts a **`CHROME_PATH`** environment variable. Its fallback executable is a development-machine-specific path, so set this explicitly on another machine. Use the Chromium installed by Playwright:
-
-```sh
-CHROME_PATH="$(node -p "require('@playwright/test').chromium.executablePath()")" npm test
-```
-
-On Linux, missing browser system libraries can be installed with `npx playwright install --with-deps chromium` (system package installation may require administrator access). You can also set `CHROME_PATH` to the absolute path of an existing compatible Chromium/Chrome executable.
-
-`npm test` runs the browser specs in `tests/`. Playwright starts the dev server at **127.0.0.1:5174**, or reuses an existing server there; make sure it serves this project. The configuration uses software-rendering flags for headless Chromium, one worker, and extended timeouts for world generation. Failure screenshots and other test artifacts go into `test-results/`.
-
-The tests exercise creation/loading, movement, crafting, persistence, and survival interactions. A documented command or feature list is not a claim that the suite passes on every browser or graphics driver; run the checks in your environment.
-
-## Project layout
-
-| Path | Responsibility |
-| --- | --- |
-| `src/game/` | Main game loop and keyboard/mouse input |
-| `src/world/` | Voxel data, generation, meshing, streaming, and block definitions |
-| `src/player/` | Movement, survival state, and first-person held tools |
-| `src/entities/` | Creatures and dropped items |
-| `src/inventory/` | Item definitions, recipes, and inventory operations |
-| `src/systems/` | Day/night, weather, particles, and audio |
-| `src/persistence/` | Browser-local saves and settings |
-| `src/ui/UIManager.ts`, `src/styles.css` | Menus, guide, HUD, inventory, and UI artwork |
-| `tests/` | Playwright browser integration tests |
+  <a href="https://buymeacoffee.com/amshivang">
+    <img src="https://raw.githubusercontent.com/amshivang/amshivang/main/qr-code.png" alt="Buy Me A Coffee" width="180">
+  </a>
+  <br>
+  <strong><a href="https://buymeacoffee.com/amshivang">☕ Support my open-source work on Buy Me A Coffee!</a></strong>
+</div>

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { Inventory } from '../inventory/Inventory.ts';
 import { ITEMS } from '../inventory/items.ts';
 import { Player } from '../player/Player.ts';
+import { BlockId } from '../world/blocks.ts';
 import { World } from '../world/World.ts';
 import { ParticleSystem } from '../systems/Particles.ts';
 
@@ -36,13 +37,15 @@ export class EntityManager {
     Object.entries(ITEMS).forEach(([id, definition]) => this.materials.set(id, new THREE.MeshLambertMaterial({ color: definition.color })));
   }
 
-  spawnDrop(id: string, position: THREE.Vector3, count = 1, durability?: number): void {
-    if (!ITEMS[id] || count < 1) return;
+  spawnDrop(id: string, position: THREE.Vector3, count = 1, durability?: number): DroppedItem | undefined {
+    if (!ITEMS[id] || count < 1) return undefined;
     if (this.drops.length >= 128) this.removeDrop(0);
     const mesh = new THREE.Mesh(this.dropGeometry, this.materials.get(id));
     mesh.position.copy(position).add(new THREE.Vector3(0, .15, 0));
-    this.drops.push({ mesh, id, count, durability, velocity: new THREE.Vector3((Math.random() - .5) * 1.2, 2.2, (Math.random() - .5) * 1.2), life: 300, age: 0 });
+    const drop: DroppedItem = { mesh, id, count, durability, velocity: new THREE.Vector3((Math.random() - .5) * 1.2, 2.2, (Math.random() - .5) * 1.2), life: 300, age: 0 };
+    this.drops.push(drop);
     this.group.add(mesh);
+    return drop;
   }
 
   update(dt: number, night: boolean): void {
@@ -81,14 +84,15 @@ export class EntityManager {
     const x = Math.floor(this.player.object.position.x + Math.cos(angle) * radius); const z = Math.floor(this.player.object.position.z + Math.sin(angle) * radius);
     if (!this.world.chunks.has(`${Math.floor(x / 16)},${Math.floor(z / 16)}`)) return;
     const y = this.world.getSurfaceY(x, z);
-    if (Math.abs(y - this.player.object.position.y) > 15 || this.world.getBlock(x, y, z) === 8) return;
+    const surfaceBlock = this.world.getBlock(x, y - 1, z);
+    if (Math.abs(y - this.player.object.position.y) > 15 || this.world.getBlock(x, y, z) === BlockId.Water || surfaceBlock === BlockId.Leaves) return;
     const roll = Math.random();
     const kind: CreatureKind = night ? (roll < .5 ? 'mireling' : roll < .75 ? 'skyshard' : 'brambleback') : roll < .7 ? 'mosskin' : roll < .9 ? 'brambleback' : 'skyshard';
     this.spawnCreature(kind, x + .5, y, z + .5);
   }
 
-  spawnCreature(kind: CreatureKind, x: number, y: number, z: number): void {
-    const definition = CREATURES[kind]; if (!definition) return;
+  spawnCreature(kind: CreatureKind, x: number, y: number, z: number): Creature | undefined {
+    const definition = CREATURES[kind]; if (!definition) return undefined;
     const object = new THREE.Group(); const material = this.materials.get(kind);
     const addBox = (w: number, h: number, d: number, px: number, py: number, pz: number, mat = material) => { const box = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); box.position.set(px, py, pz); box.castShadow = true; object.add(box); return box; };
     addBox(.85, .65, 1, 0, .65, 0);
@@ -100,7 +104,9 @@ export class EntityManager {
     if (kind === 'skyshard') { const crystal = new THREE.Mesh(new THREE.OctahedronGeometry(.38), material); crystal.position.set(0, 1.35, 0); object.add(crystal); }
     if (kind === 'mosskin') addBox(.96, .16, 1.08, 0, 1.02, .02);
     object.position.set(x, y, z); object.userData.creature = definition.name; this.group.add(object);
-    this.creatures.push({ object, kind, health: definition.health, velocity: new THREE.Vector3(), cooldown: 1, wander: 2, direction: new THREE.Vector3(Math.random() - .5, 0, Math.random() - .5).normalize(), hurt: 0 });
+    const creature: Creature = { object, kind, health: definition.health, velocity: new THREE.Vector3(), cooldown: 1, wander: 2, direction: new THREE.Vector3(Math.random() - .5, 0, Math.random() - .5).normalize(), hurt: 0 };
+    this.creatures.push(creature);
+    return creature;
   }
 
   private updateCreatures(dt: number, night: boolean): void {
@@ -177,8 +183,14 @@ export class EntityManager {
   serialize(): EntitySave { return { drops: this.drops.map((drop) => ({ id: drop.id, count: drop.count, durability: drop.durability, position: drop.mesh.position.toArray(), life: drop.life })), creatures: this.creatures.map((creature) => ({ kind: creature.kind, health: creature.health, position: creature.object.position.toArray() })) }; }
   load(data?: EntitySave): void {
     if (!data) return;
-    for (const drop of data.drops.slice(0, 128)) { this.spawnDrop(drop.id, new THREE.Vector3(...drop.position), drop.count, drop.durability); this.drops[this.drops.length - 1].life = drop.life; }
-    for (const creature of data.creatures.slice(0, 14)) { this.spawnCreature(creature.kind, ...creature.position as [number, number, number]); this.creatures[this.creatures.length - 1].health = creature.health; }
+    for (const drop of data.drops.slice(0, 128)) {
+      const spawned = this.spawnDrop(drop.id, new THREE.Vector3(...drop.position), drop.count, drop.durability);
+      if (spawned) spawned.life = drop.life;
+    }
+    for (const creature of data.creatures.slice(0, 14)) {
+      const spawned = this.spawnCreature(creature.kind, ...creature.position as [number, number, number]);
+      if (spawned) spawned.health = creature.health;
+    }
   }
   dispose(): void { while (this.creatures.length) this.removeCreature(0); this.group.clear(); this.materials.forEach((material) => material.dispose()); this.dropGeometry.dispose(); this.shotGeometry.dispose(); this.shotMaterial.dispose(); }
   get count(): number { return this.creatures.length + this.drops.length + this.projectiles.length; }

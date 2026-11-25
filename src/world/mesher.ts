@@ -31,7 +31,7 @@ export function buildChunkMesh(chunk: Chunk, get: (x: number, y: number, z: numb
   const buffers = Array.from({ length: 2 }, () => ({ positions: [] as number[], normals: [] as number[], colors: [] as number[], uvs: [] as number[], indices: [] as number[] }));
   const heights = new Int16Array(CHUNK_SIZE * CHUNK_SIZE);
   for (let z = 0; z < CHUNK_SIZE; z += 1) for (let x = 0; x < CHUNK_SIZE; x += 1) {
-    for (let y = WORLD_HEIGHT - 1; y > 0; y -= 1) if (BLOCKS[chunk.get(x, y, z)].solid) { heights[x + z * CHUNK_SIZE] = y; break; }
+    for (let y = WORLD_HEIGHT - 1; y > 0; y -= 1) if (isOpaqueSolid(chunk.get(x, y, z))) { heights[x + z * CHUNK_SIZE] = y; break; }
   }
   for (let y = 0; y < WORLD_HEIGHT; y += 1) for (let z = 0; z < CHUNK_SIZE; z += 1) for (let x = 0; x < CHUNK_SIZE; x += 1) {
     const id = chunk.get(x, y, z);

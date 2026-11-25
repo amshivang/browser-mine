@@ -21,7 +21,7 @@ export class UIManager {
   constructor(private readonly root: HTMLElement, private readonly saves: SaveManager, private readonly actions: UIActions) {
     this.settings = saves.settings;
     this.screen = document.createElement('div'); this.screen.className = 'screen'; root.append(this.screen);
-    this.panel = document.createElement('div'); this.panel.className = 'panel hidden'; root.append(this.panel);
+    this.panel = document.createElement('div'); this.panel.className = 'panel hidden'; this.panel.setAttribute('role', 'dialog'); this.panel.setAttribute('aria-modal', 'true'); this.panel.tabIndex = -1; root.append(this.panel);
     this.hud = document.createElement('div'); this.hud.className = 'hud hidden';
     this.hud.innerHTML = `<div class="crosshair" aria-hidden="true"></div><div class="environment"></div><div class="hint"></div><div class="status"><div class="bar health" role="meter" aria-label="Health" aria-valuemin="0" aria-valuemax="100"><i></i><label>HEALTH</label></div><div class="bar hunger" role="meter" aria-label="Hunger" aria-valuemin="0" aria-valuemax="100"><i></i><label>HUNGER</label></div></div><div class="selected-name"></div><div class="hotbar" aria-label="Hotbar · select with 1–9 or mouse wheel"></div><div class="hotbar-help">1–9 SELECT <span>·</span> WHEEL CYCLE</div><div class="mining"><i></i></div><div class="debug"></div>`;
     root.append(this.hud);
@@ -334,7 +334,7 @@ export class UIManager {
   toast(message: string): void { this.toastElement.textContent = message; this.toastElement.style.display = 'block'; window.clearTimeout(this.toastTimer); this.toastTimer = window.setTimeout(() => { this.toastElement.style.display = 'none'; }, 4000); }
   damage(): void { this.hud.classList.remove('damage-flash'); void this.hud.offsetWidth; this.hud.classList.add('damage-flash'); }
   error(message: string): void { this.closePanel(); this.hud.classList.add('hidden'); this.screen.classList.remove('hidden'); this.screen.innerHTML = `<div class="menu-card"><div class="brand-kicker danger-text">A bend in the trail</div><h2 class="subhead">Unable to continue</h2><p class="tagline compact">${this.escape(message)}</p><button class="primary full-width" data-action="back">Return to menu</button></div>`; this.bindScreen({ back: () => this.mainMenu() }); }
-  private setPanel(html: string, wide = false): void { this.cancelKeyCapture(); this.panel.classList.remove('hidden'); this.panel.classList.toggle('panel-wide', wide); this.panel.innerHTML = html; }
+  private setPanel(html: string, wide = false): void { this.cancelKeyCapture(); this.panel.classList.remove('hidden'); this.panel.classList.toggle('panel-wide', wide); this.panel.innerHTML = html; this.panel.querySelector<HTMLElement>('button, input, select, [tabindex="0"]')?.focus({ preventScroll: true }); }
   private cancelKeyCapture(): void { if (this.keyCapture) window.removeEventListener('keydown', this.keyCapture, { capture: true }); this.keyCapture = undefined; }
   private bindScreen(actions: Record<string, () => void>): void { this.cancelKeyCapture(); this.screen.querySelectorAll<HTMLButtonElement>('[data-action]').forEach((button) => button.onclick = actions[button.dataset.action ?? '']); }
   private bindPanel(actions: Record<string, () => void>): void { this.cancelKeyCapture(); this.panel.querySelectorAll<HTMLButtonElement>('[data-action]').forEach((button) => button.onclick = actions[button.dataset.action ?? '']); }

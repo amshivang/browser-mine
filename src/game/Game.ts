@@ -91,12 +91,18 @@ export class Game {
     } catch (error) { this.ui.error(`World loading failed: ${String(error)}`); }
   }
 
+  private disposeWorld(): void {
+    if (this.world) { this.scene.remove(this.world.scene); this.world.dispose(); this.world = undefined; }
+    if (this.player) { this.scene.remove(this.player.object); this.player = undefined; }
+    if (this.entities) { this.scene.remove(this.entities.group); this.entities.dispose(); this.entities = undefined; }
+    if (this.hand) { this.hand.dispose(); this.hand = undefined; }
+    this.target = undefined;
+    this.outline.visible = false;
+  }
+
   private startWorld(seed: string, position?: [number, number, number]): void {
     this.ui.loading(); this.playing = false;
-    if (this.world) { this.scene.remove(this.world.scene); this.world.dispose(); }
-    if (this.player) this.scene.remove(this.player.object);
-    if (this.entities) { this.scene.remove(this.entities.group); this.entities.dispose(); }
-    this.hand?.dispose();
+    this.disposeWorld();
     this.input.keys.clear(); this.mineProgress = 0; this.attackCooldown = 0; this.saveTimer = 0;
     this.world = new World(seed); this.world.renderDistance = this.saves.settings.renderDistance; this.world.loadingDistance = this.saves.settings.loadingDistance;
     let startingPosition = position;
@@ -160,9 +166,14 @@ export class Game {
 
   private handleKeys(): void {
     if (!this.player) return;
-    for (let i = 1; i <= 9; i += 1) if (this.input.consume(`Digit${i}`)) this.player.inventory.setSelected(i - 1);
+    if (!this.ui.isPanelOpen()) {
+      for (let i = 1; i <= 9; i += 1) if (this.input.consume(`Digit${i}`)) this.player.inventory.setSelected(i - 1);
+    }
     if (this.input.consume(this.input.bindings.inventory) && this.player.health > 0) { if (this.ui.isPanelOpen()) { this.ui.closePanel(); this.resume(); } else { document.exitPointerLock(); this.ui.inventory(this.player.inventory); } }
-    if (this.input.consume('Escape') && !this.ui.isPanelOpen()) { document.exitPointerLock(); this.ui.pause(); }
+    if (this.input.consume('Escape')) {
+      if (this.ui.isPanelOpen()) { this.ui.closePanel(); this.resume(); }
+      else { document.exitPointerLock(); this.ui.pause(); }
+    }
     if (this.input.consume('F3')) { this.saves.settings.debug = !this.saves.settings.debug; try { this.saves.saveSettings(); } catch { this.ui.toast('Debug preference applies for this session; browser storage is unavailable.'); } }
     if (this.input.consume('F5')) void this.save();
     if (!this.ui.isPanelOpen() && this.input.consume(this.input.bindings.eat) && this.player.eat()) { this.audio.play('pickup'); this.ui.toast('A little energy for the journey.'); }
@@ -215,6 +226,6 @@ export class Game {
     try { await this.saves.save(data); if (notify) this.ui.toast('World saved. Your story is safe.'); } catch (error) { this.ui.toast(`Save failed: ${String(error)}. Free browser storage and try again.`); }
   }
 
-  private async quit(): Promise<void> { await this.save(false); document.exitPointerLock(); this.playing = false; this.ui.mainMenu(); }
+  private async quit(): Promise<void> { await this.save(false); document.exitPointerLock(); this.playing = false; this.disposeWorld(); this.ui.mainMenu(); }
   private resize(): void { const width = window.innerWidth; const height = window.innerHeight; this.renderer.setSize(width, height); this.menuCamera.aspect = width / height; this.menuCamera.updateProjectionMatrix(); if (this.player) { this.player.camera.aspect = width / height; this.player.camera.updateProjectionMatrix(); } }
 }

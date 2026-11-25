@@ -10,7 +10,7 @@ export default defineConfig({
     headless: true,
     screenshot: 'only-on-failure',
     launchOptions: {
-      executablePath: process.env.CHROME_PATH ?? '/home/shivang/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome',
+      executablePath: process.env.CHROME_PATH || undefined,
       args: ['--no-sandbox', '--enable-unsafe-swiftshader', '--use-gl=angle', '--use-angle=swiftshader'],
     },
   },

@@ -124,7 +124,7 @@ function sanitizeWorld(value: unknown): WorldSave {
     const key = `${x},${y},${z}`;
     // A deleted/replaced cache must not retain an inaccessible inventory.
     const edit = edits.get(key);
-    if (edit && edit.id !== 20) continue;
+    if (!edit || edit.id !== 20) continue;
     containers.set(key, stacks(entry[1], 27));
   }
   const yaw = field(player, 'yaw');

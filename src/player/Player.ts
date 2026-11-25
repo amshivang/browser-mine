@@ -6,6 +6,7 @@ import { InputManager } from '../game/InputManager.ts';
 import { ITEMS } from '../inventory/items.ts';
 
 export class Player {
+  private static readonly HALF_WIDTH = .2999;
   readonly object = new THREE.Object3D();
   readonly camera = new THREE.PerspectiveCamera(72, 1, .05, 700);
   readonly inventory = new Inventory();
@@ -97,8 +98,8 @@ export class Player {
   }
 
   private collides(x: number, y: number, z: number, height = this.height): boolean {
-    for (let bx = Math.floor(x - .3 + .0001); bx <= Math.floor(x + .3 - .0001); bx += 1)
-      for (let bz = Math.floor(z - .3 + .0001); bz <= Math.floor(z + .3 - .0001); bz += 1)
+    for (let bx = Math.floor(x - Player.HALF_WIDTH); bx <= Math.floor(x + Player.HALF_WIDTH); bx += 1)
+      for (let bz = Math.floor(z - Player.HALF_WIDTH); bz <= Math.floor(z + Player.HALF_WIDTH); bz += 1)
         for (let by = Math.floor(y + .001); by <= Math.floor(y + height - .001); by += 1)
           if (this.world.isBlockSolid(bx, by, bz)) return true;
     return false;
@@ -117,7 +118,7 @@ export class Player {
     if (!this.collides(p.x, p.y, p.z)) { this.grounded = false; return; }
     if (amount < 0) {
       let floor = -Infinity;
-      for (let x = Math.floor(p.x - .299); x <= Math.floor(p.x + .299); x += 1) for (let z = Math.floor(p.z - .299); z <= Math.floor(p.z + .299); z += 1)
+      for (let x = Math.floor(p.x - Player.HALF_WIDTH); x <= Math.floor(p.x + Player.HALF_WIDTH); x += 1) for (let z = Math.floor(p.z - Player.HALF_WIDTH); z <= Math.floor(p.z + Player.HALF_WIDTH); z += 1)
         for (let y = Math.floor(p.y); y <= Math.floor(old); y += 1) if (this.world.isBlockSolid(x, y, z)) floor = Math.max(floor, y + 1);
       p.y = Number.isFinite(floor) ? floor : old;
       if (this.velocity.y < -12 && !swimming) this.takeDamage(Math.floor((Math.abs(this.velocity.y) - 12) * 2.2));
